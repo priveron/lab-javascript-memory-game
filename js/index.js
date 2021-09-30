@@ -1,3 +1,5 @@
+import { MemoryGame } from './memory.js'
+
 const cards = [
   { name: 'aquaman', img: 'aquaman.jpg' },
   { name: 'batman', img: 'batman.jpg' },
@@ -43,9 +45,29 @@ window.addEventListener('load', (event) => {
 
   // Bind the click event of each element to a function
   document.querySelectorAll('.card').forEach((card) => {
-    card.addEventListener('click', () => {
-      // TODO: write some code here
-      console.log(`Card clicked: ${card}`);
+    card.addEventListener('click', (evt) => {
+      if (!card.classList.contains("turned") && memoryGame.pickedCards.length < 2) {
+        card.classList.toggle("turned");
+        memoryGame.pickedCards.push(card);
+      }
+      if (memoryGame.pickedCards.length === 2 && memoryGame.pickedCards.includes(card)) {
+        if (memoryGame.checkIfPair(memoryGame.pickedCards[0].getAttribute('data-card-name'), memoryGame.pickedCards[1].getAttribute('data-card-name'))) {
+          document.querySelector("#pairs-clicked").textContent = memoryGame.pairsClicked;
+          document.querySelector("#pairs-guessed").textContent = memoryGame.pairsGuessed;
+          memoryGame.pickedCards[0].classList.toggle("blocked");
+          memoryGame.pickedCards[1].classList.toggle("blocked");
+          memoryGame.pickedCards = [];
+          if (memoryGame.checkIfFinished())
+            return true;
+        }
+        else {
+          document.querySelector("#pairs-clicked").textContent = memoryGame.pairsClicked;
+          setTimeout(() => {
+            memoryGame.pickedCards.forEach((v) => v.classList.toggle("turned"));
+            memoryGame.pickedCards = [];
+          }, 1000);
+        }
+      }
     });
   });
 });
